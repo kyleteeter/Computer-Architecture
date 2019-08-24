@@ -2,6 +2,10 @@
 
 import sys
 
+HTL = 0b00000001
+PRN = 0b01000111
+LDI = 0b10000010
+
 class CPU:
     """Main CPU class."""
 
@@ -22,7 +26,7 @@ class CPU:
 
     def op_hlt(self):
         self.halt = True
-        
+
     def ram_read(self, pc_address):
         return self.ram[pc_address]
 
@@ -82,27 +86,37 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        HTL = 0b00000001
-        PRN = 0b01000111
-        LDI = 0b10000010
+        while not self.halt:
+            ir = self.ram[self.pc]
+            int_size = (ir >> 6) + 1
 
-        running = True
-        while running:
-            command = self.ram[self.pc]
-            if command == HTL:
-                running = False
-            elif command == LDI:
-                #reg location
-                operand_a = self.ram_read(self.pc + 1)
-                #value
-                operand_b = self.ram_read(self.pc + 2)
-                #set value of a register to an integer
-                self.reg[operand_a] = operand_b
-                self.pc += 3
-            elif command == PRN:
-                #Print numeric value stored in the given register
-                print(self.reg[self.ram[self.pc + 1]])
-                self.pc += 2
+            operand_1 = self.ram[self.pc + 1]
+            operand_2 = self.ram[self.pc +2]
+
+            if ir in self.ins:
+                self.ins[ir](operand_1, operand_2)
             else:
-                print("Error: Command not found")
+                print('error: command not found')
+
+                self.pc += int_size
+
+        # running = True
+        # while running:
+        #     command = self.ram[self.pc]
+        #     if command == HTL:
+        #         running = False
+        #     elif command == LDI:
+        #         #reg location
+        #         operand_a = self.ram_read(self.pc + 1)
+        #         #value
+        #         operand_b = self.ram_read(self.pc + 2)
+        #         #set value of a register to an integer
+        #         self.reg[operand_a] = operand_b
+        #         self.pc += 3
+        #     elif command == PRN:
+        #         #Print numeric value stored in the given register
+        #         print(self.reg[self.ram[self.pc + 1]])
+        #         self.pc += 2
+        #     else:
+        #         print("Error: Command not found")
 
