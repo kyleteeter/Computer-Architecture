@@ -5,11 +5,11 @@ import sys
 class CPU:
     """Main CPU class."""
 
-    def __init__(self, ram=[0] * 25, reg=[0] * 8, pc=0):
+    def __init__(self):
         """Construct a new CPU."""
-        self.ram = ram
-        self.reg = reg
-        self.pc = pc
+        self.ram = [0] * 25
+        self.reg = [0] * 8
+        self.pc = 0
 
     def ram_read(self, pc_address):
         return self.ram[pc_address]
@@ -70,4 +70,27 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        
+        HTL = 0b00000001
+        PRN = 0b01000111
+        LDI = 0b10000010
+
+        running = True
+        while running:
+            command = self.ram[self.pc]
+            if command == HTL:
+                running = False
+            elif command == LDI:
+                #reg location
+                operand_a = self.ram_read(self.pc + 1)
+                #value
+                operand_b = self.ram_read(self.pc + 2)
+                #set value of a register to an integer
+                self.reg[operand_a] = operand_b
+                self.pc += 3
+            elif command == PRN:
+                #Print numeric value stored in the given register
+                print(self.reg[self.ram[self.pc + 1]])
+                self.pc += 2
+            else:
+                print("Error: Command not found")
+
