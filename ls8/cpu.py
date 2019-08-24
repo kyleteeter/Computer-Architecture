@@ -10,7 +10,19 @@ class CPU:
         self.ram = [0] * 25
         self.reg = [0] * 8
         self.pc = 0
+        self.halt = False
 
+        self.ins = {
+            ADD: self.op_add,
+            HLT: self.op_hlt
+        }
+
+    def op_add(self, reg1, reg2):
+        self.reg[reg1] += self.reg[reg2]
+
+    def op_hlt(self):
+        self.halt = True
+        
     def ram_read(self, pc_address):
         return self.ram[pc_address]
 
