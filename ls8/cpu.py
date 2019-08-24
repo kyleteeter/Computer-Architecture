@@ -12,10 +12,10 @@ class CPU:
         self.pc = pc
 
     def ram_read(self, pc_address):
-        pass
+        return self.ram[pc_address]
 
     def ram_write(self, value, pc_address):
-        pass
+        self.ram[pc_address] = value
 
     def load(self):
         """Load a program into memory."""
@@ -70,4 +70,4 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        
