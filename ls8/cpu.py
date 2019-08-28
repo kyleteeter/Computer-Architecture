@@ -90,8 +90,8 @@ class CPU:
             ir = self.ram[self.pc]
             int_size = (ir >> 6) + 1
 
-            operand_1 = self.ram_read[self.pc + 1]
-            operand_2 = self.ram_read[self.pc +2]
+            operand_1 = self.ram_read(self.pc + 1)
+            operand_2 = self.ram_read(self.pc +2)
 
             if ir in self.ins:
                 self.ins[ir](operand_1, operand_2)
