@@ -2,9 +2,10 @@
 
 import sys
 
-HTL = 0b00000001
+HLT = 0b00000001
 PRN = 0b01000111
 LDI = 0b10000010
+MUL = 0b10100010 
 
 class CPU:
     """Main CPU class."""
@@ -14,11 +15,14 @@ class CPU:
         self.ram = [0] * 25
         self.reg = [0] * 8
         self.pc = 0
-        self.halt = False
+        self.hlt = False
 
         self.ins = {
-            ADD: self.op_add,
-            HLT: self.op_hlt
+            # ADD: self.op_add,
+            HLT: self.op_hlt,
+            LDI: self.op_ldi,
+            MUL: self.op_mul,
+            PRN: self.op_prn
         }
 
     def op_add(self, reg1, reg2):
@@ -26,6 +30,9 @@ class CPU:
 
     def op_hlt(self):
         self.hlt = True
+
+    def op_ldi(self, addr, value):
+        self.reg[addr] = value
 
     def ram_read(self, pc_address):
         return self.ram[pc_address]
