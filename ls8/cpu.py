@@ -12,7 +12,7 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        self.ram = [0] * 25
+        self.ram = [0] * 256
         self.reg = [0] * 8
         self.pc = 0
         self.hlt = False
@@ -26,33 +26,42 @@ class CPU:
         }
 
 
-    def ram_read(self, pc_address):
-        return self.ram[pc_address]
 
-    def ram_write(self, value, pc_address):
-        self.ram[pc_address] = value
 
-    def load(self):
+    def load(self, filename):
         """Load a program into memory."""
 
         address = 0
 
         # For now, we've just hardcoded a program:
 
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+        # program = [
+        #     # From print8.ls8
+        #     0b10000010, # LDI R0,8
+        #     0b00000000,
+        #     0b00001000,
+        #     0b01000111, # PRN R0
+        #     0b00000000,
+        #     0b00000001, # HLT
+        # ]
 
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
-
+        # for instruction in program:
+        #     self.ram[address] = instruction
+        #     address += 1
+        try:
+            # sys.argv is a list in Python, which contains the command-line arguments passed to the script.
+            with open(sys.argv[1]) as f:  # open a file
+                for line in f:
+                    if line[0].startswith('0') or line[0].startswith('1'):
+                        # search first part of instruction
+                        num = line.split('#')[0]
+                        num = num.strip()  # remove empty space
+                        # convert binary to int and store in a memory(RAM)
+                        self.ram[address] = int(num, 2)
+                        address += 1
+        except FileNotFoundError:
+            print(f"{sys.argv[0]}: {sys.argv[1]} Not found")
+            sys.exit(2)
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -60,6 +69,8 @@ class CPU:
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         #elif op == "SUB": etc
+        elif op == "MUL":
+            self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -81,27 +92,34 @@ class CPU:
         for i in range(8):
             print(" %02X" % self.reg[i], end='')
 
-        print()
+    def ram_read(self, pc_address):
+        return self.ram[pc_address]
+
+    def ram_write(self, value, pc_address):
+        self.ram[pc_address] = value
 
     def run(self):
         """Run the CPU."""
         while not self.hlt:
             ir = self.ram[self.pc]
-            int_size = (ir >> 6) + 1
-
             operand_1 = self.ram_read(self.pc + 1)
-            operand_2 = self.ram_read(self.pc +2)
+            operand_2 = self.ram_read(self.pc + 2)
+            int_size = (ir >> 6) 
+            self.inst_set_pc = ((ir >> 4) & 0b1) == 1
+        
 
             if ir in self.ins:
                 self.ins[ir](operand_1, operand_2)
             else:
                 print('error: command not found')
+            
+            if not self.inst_set_pc:
                 self.pc += int_size + 1
 
-    def op_add(self, reg1, reg2):
-        self.reg[reg1] += self.reg[reg2]
+    # def op_add(self, reg1, reg2):
+    #     self.reg[reg1] += self.reg[reg2]
 
-    def op_hlt(self):
+    def op_hlt(self, operand_1, operand_2):
         self.hlt = True
 
     def op_ldi(self, addr, value):
@@ -110,7 +128,7 @@ class CPU:
     def op_mul(self, operand_1, operand_2):
         self.alu('MUL', operand_1, operand_2)
 
-    def op_prn(self, addr, operand_b):
+    def op_prn(self, addr, operand_2):
         print(self.reg[addr])
         # running = True
         # while running:
