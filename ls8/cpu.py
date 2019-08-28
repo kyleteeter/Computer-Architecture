@@ -25,14 +25,6 @@ class CPU:
             PRN: self.op_prn
         }
 
-    def op_add(self, reg1, reg2):
-        self.reg[reg1] += self.reg[reg2]
-
-    def op_hlt(self):
-        self.hlt = True
-
-    def op_ldi(self, addr, value):
-        self.reg[addr] = value
 
     def ram_read(self, pc_address):
         return self.ram[pc_address]
@@ -106,7 +98,20 @@ class CPU:
                 print('error: command not found')
                 self.pc += int_size + 1
 
+    def op_add(self, reg1, reg2):
+        self.reg[reg1] += self.reg[reg2]
 
+    def op_hlt(self):
+        self.hlt = True
+
+    def op_ldi(self, addr, value):
+        self.reg[addr] = value
+
+    def op_mul(self, operand_1, operand_2):
+        self.alu('MUL', operand_1, operand_2)
+
+    def op_prn(self, addr, operand_b):
+        print(self.reg[addr])
         # running = True
         # while running:
         #     command = self.ram[self.pc]
