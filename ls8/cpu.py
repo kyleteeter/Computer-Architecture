@@ -9,6 +9,8 @@ MUL = 0b10100010
 POP = 0b01000110
 PUSH = 0b01000101
 
+SP = 7
+
 class CPU:
     """Main CPU class."""
 
@@ -17,7 +19,9 @@ class CPU:
         self.ram = [0] * 256
         self.reg = [0] * 8
         self.pc = 0
+        self.reg[SP] = 0xF3
         self.hlt = False
+        self.inst_set_pc = False
 
         self.ins = {
             # ADD: self.op_add,
@@ -100,12 +104,12 @@ class CPU:
         return self.ram[pc_address]
 
     def ram_write(self, value, pc_address):
-        self.ram[pc_address] = value
+        self.ram[value] = pc_address
 
     def run(self):
         """Run the CPU."""
         while not self.hlt:
-            ir = self.ram[self.pc]
+            ir = self.ram_read(self.pc)
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
             int_size = (ir >> 6) 
@@ -136,9 +140,14 @@ class CPU:
         print(self.reg[addr])
 
     def op_pop(self, addr, operand_b):
-    
+        value = self.ram_read(self.reg[SP])
+        self.ram_write(self.reg[SP], 0)
+        self.reg[addr] = value
+        self.reg[SP] += 1
     def op_push(self, addr, operand_b):
-        
+        self.reg[SP] -= 1
+        value = self.reg[addr]
+        self.ram_write(self.reg[SP], value)
         # running = True
         # while running:
         #     command = self.ram[self.pc]
@@ -158,4 +167,3 @@ class CPU:
         #         self.pc += 2
         #     else:
         #         print("Error: Command not found")
-
