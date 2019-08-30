@@ -106,14 +106,14 @@ class CPU:
         """Run the CPU."""
         while not self.hlt:
             ir = self.ram[self.pc]
-            operand_1 = self.ram_read(self.pc + 1)
-            operand_2 = self.ram_read(self.pc + 2)
+            operand_a = self.ram_read(self.pc + 1)
+            operand_b = self.ram_read(self.pc + 2)
             int_size = (ir >> 6) 
             self.inst_set_pc = ((ir >> 4) & 0b1) == 1
         
 
             if ir in self.ins:
-                self.ins[ir](operand_1, operand_2)
+                self.ins[ir](operand_a, operand_b)
             else:
                 print('error: command not found')
             
@@ -123,17 +123,22 @@ class CPU:
     # def op_add(self, reg1, reg2):
     #     self.reg[reg1] += self.reg[reg2]
 
-    def op_hlt(self, operand_1, operand_2):
+    def op_hlt(self, operand_a, operand_b):
         self.hlt = True
 
     def op_ldi(self, addr, value):
         self.reg[addr] = value
 
-    def op_mul(self, operand_1, operand_2):
-        self.alu('MUL', operand_1, operand_2)
+    def op_mul(self, operand_a, operand_b):
+        self.alu('MUL', operand_a, operand_b)
 
-    def op_prn(self, addr, operand_2):
+    def op_prn(self, addr, operand_b):
         print(self.reg[addr])
+
+    def op_pop(self, addr, operand_b):
+    
+    def op_push(self, addr, operand_b):
+        
         # running = True
         # while running:
         #     command = self.ram[self.pc]
