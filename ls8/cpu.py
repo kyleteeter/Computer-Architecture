@@ -6,6 +6,8 @@ HLT = 0b00000001
 PRN = 0b01000111
 LDI = 0b10000010
 MUL = 0b10100010 
+POP = 0b01000110
+PUSH = 0b01000101
 
 class CPU:
     """Main CPU class."""
@@ -22,7 +24,9 @@ class CPU:
             HLT: self.op_hlt,
             LDI: self.op_ldi,
             MUL: self.op_mul,
-            PRN: self.op_prn
+            PRN: self.op_prn,
+            POP: self.op_pop,
+            PUSH: self.op_push
         }
 
 
